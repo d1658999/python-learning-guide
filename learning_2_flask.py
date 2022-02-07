@@ -3,6 +3,7 @@ from vsearch import search4letters
 
 app = Flask(__name__)
 
+
 def log_request(req: 'flask_request', res: str) -> None:
     dbconfig = {'host': '127.0.0.1',
                 'user': 'vsearch',
@@ -13,19 +14,17 @@ def log_request(req: 'flask_request', res: str) -> None:
     cursor = conn.cursor()
     _SQL = """insert into log
               (phrase, letters, ip, browser_string,results)
-              valuse
+              values
               (%s, %s, %s, %s, %s)"""
-    cursor.excute(_SQL, (req.form['phrase'],
-                         req.form['letters'],
-                         req.remote_addr,
-                         req.user_agent.browser,
-                         res, ))
+    cursor.execute(_SQL, (req.form['phrase'],
+                          req.form['letters'],
+                          req.remote_addr,
+                          req.user_agent.browser,
+                          res,))
+
     conn.commit()
     cursor.close()
     conn.close()
-
-
-
 
 
 @app.route('/viewlog')
@@ -40,8 +39,7 @@ def view_the_log() -> 'html':
     return render_template('viewlog.html',
                            the_title='View Log',
                            the_row_titles=titles,
-                           the_data=contents,)
-
+                           the_data=contents, )
 
 
 # @app.route('/')
@@ -63,11 +61,12 @@ def do_search() -> 'html':
                            the_results=results,
                            )
 
+
 @app.route('/')
 @app.route('/entry')
 def entry_page() -> 'html':
     return render_template('entry.html', the_title='Welcome to search4letters on the web!')
 
+
 if __name__ == '__main__':
     app.run(debug=True)
-
